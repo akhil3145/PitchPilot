@@ -1,11 +1,15 @@
-# 🚀 AI Cold Mail Generator
+ <p align="center">
+  <img src="pitchpilot-logo.png" alt="PitchPilot logo" width="420" />
+</p>
 
-### ✉️ Craft personalized cold emails, LinkedIn DMs & follow-ups with AI.
-
-A full-stack AI-powered outreach application built with **React, Node.js, Express, MongoDB, and Groq AI**. This project is being customized and improved as a hands-on journey into full-stack development and AI integration. 🤖
+<h1 align="center">🚀 PitchPilot</h1>
 
 <p align="center">
-  <img src="image.png" alt="AI Cold Mail Generator preview" width="800" />
+  <strong>Your AI Copilot for Smarter Outreach</strong>
+</p>
+
+<p align="center">
+  Generate personalized cold emails, LinkedIn DMs, and follow-ups with AI.
 </p>
 
 <p align="center">
@@ -19,6 +23,14 @@ A full-stack AI-powered outreach application built with **React, Node.js, Expres
 
 ---
 
+## ✨ About PitchPilot
+
+**PitchPilot** is a full-stack, AI-powered outreach application built with React, Node.js, Express, MongoDB, and Groq AI.
+
+It helps users draft personalized messages for professional networking, job applications, and business outreach. This project is also a hands-on journey into full-stack development, AI integration, authentication, and deployment.
+
+> 🧪 **Project status:** Under active development. Some features and deployment configurations still need end-to-end testing.
+
 ## ✨ Features
 
 - 🤖 **AI-Powered Writing** — Generate personalized outreach messages using the Groq API.
@@ -30,33 +42,31 @@ A full-stack AI-powered outreach application built with **React, Node.js, Expres
 - 🗄️ **MongoDB Integration** — Database models for users and email history.
 - 🐳 **Docker Support** — Dockerfiles and Docker Compose configuration are included.
 
-> 🧪 **Project status:** Features are being tested and improved. Not every flow or deployment configuration has been verified yet.
-
 ## 🛠️ Tech Stack
 
-| Technology            | Purpose                         |
-| --------------------- | ------------------------------- |
-| ⚛️ React + Vite       | Frontend and development server |
-| 🎨 Tailwind CSS       | UI styling                      |
-| 🟢 Node.js + Express  | Backend and REST API            |
-| 🍃 MongoDB + Mongoose | Data storage                    |
-| 🧠 Groq API           | AI-powered message generation   |
-| 🔑 JWT + bcrypt       | Authentication utilities        |
-| 📧 Nodemailer         | Email delivery and verification |
-| 🐳 Docker             | Containerization                |
-| 🌿 Git + GitHub       | Version control                 |
+| Technology | Purpose |
+|---|---|
+| ⚛️ React + Vite | Frontend and development server |
+| 🎨 Tailwind CSS | UI styling |
+| 🟢 Node.js + Express | Backend and REST API |
+| 🍃 MongoDB + Mongoose | Data storage |
+| 🧠 Groq API | AI-powered message generation |
+| 🔑 JWT + bcrypt | Authentication utilities |
+| 📧 Nodemailer | Email delivery and verification |
+| 🐳 Docker | Containerization |
+| 🌿 Git + GitHub | Version control |
 
 ## 🏗️ Project Structure
 
 ```text
-AI-Cold-Mail-Generator/
-├── client/                     # ⚛️ React frontend
+PitchPilot/
+├── client/                     # React frontend
 │   └── src/
 │       ├── components/         # Reusable UI components
 │       ├── context/            # Authentication context
 │       ├── pages/              # Application pages
 │       └── utils/              # API configuration
-├── server/                     # 🟢 Express backend
+├── server/                     # Express backend
 │   ├── config/                 # Database configuration
 │   ├── controllers/             # Application logic
 │   ├── middleware/              # Authentication middleware
@@ -78,12 +88,13 @@ Make sure you have:
 - [Node.js and npm](https://nodejs.org/)
 - A MongoDB database — [MongoDB Atlas](https://www.mongodb.com/atlas) or a local instance
 - A [Groq API key](https://console.groq.com/) for AI generation
+- [Git](https://git-scm.com/)
 
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/akhil3145/ai-cold-mail-generator.git
-cd ai-cold-mail-generator
+git clone https://github.com/akhil3145/pitchpilot.git
+cd pitchpilot
 ```
 
 ### 2️⃣ Install dependencies
@@ -100,7 +111,7 @@ This installs dependencies for the root project, backend, and frontend.
 
 Create `server/.env` using `server/.env.example` as a template.
 
-Configure the values required by the backend:
+Configure the backend values required by your version of the code:
 
 ```dotenv
 PORT=5000
@@ -125,7 +136,7 @@ VITE_API_URL=http://localhost:5000/api
 - Use placeholders in example files.
 - Configure production secrets through your hosting provider's environment settings.
 
-Check the backend configuration and `.env.example` for the exact variables required by your version of the code.
+Check the backend configuration and `.env.example` for the exact environment variables required by your version of the code.
 
 ### 4️⃣ Start the application 🚀
 
@@ -137,10 +148,10 @@ npm run dev
 
 The development servers are expected at:
 
-| Service     | URL                   |
-| ----------- | --------------------- |
+| Service | URL |
+|---|---|
 | 💻 Frontend | http://localhost:5173 |
-| ⚙️ Backend  | http://localhost:5000 |
+| ⚙️ Backend | http://localhost:5000 |
 
 The backend needs a working MongoDB connection. AI generation requires a valid Groq API key.
 
@@ -162,7 +173,7 @@ To stop the containers:
 docker compose down
 ```
 
-⚠️ Review the Docker configuration before running it. Use secure secrets and verify that the configured environment variable names match the backend code.
+⚠️ Review the Docker configuration before running it. Use secure secrets and verify that configured environment variable names match the backend code.
 
 ## 🗺️ Roadmap
 
@@ -178,7 +189,7 @@ docker compose down
 
 ## 🎯 What I'm Learning
 
-Through this project, I'm building practical experience with:
+Through PitchPilot, I'm building practical experience with:
 
 - Connecting a React frontend to an Express backend.
 - Designing and working with REST APIs.
@@ -190,7 +201,7 @@ Through this project, I'm building practical experience with:
 
 ## 🤝 Acknowledgements
 
-This project started from [ShivaMani02/AI-COLD-MAIL-GENERATOR-MONOREPO](https://github.com/ShivaMani02/AI-COLD-MAIL-GENERATOR-MONOREPO).
+PitchPilot started from [ShivaMani02/AI-COLD-MAIL-GENERATOR-MONOREPO](https://github.com/ShivaMani02/AI-COLD-MAIL-GENERATOR-MONOREPO).
 
 🙏 Credit to the original author for the starting codebase. This repository is being customized for learning and further development.
 
@@ -199,5 +210,5 @@ Please verify the original project's licensing terms before redistributing a der
 ---
 
 <p align="center">
-  💻 <b>Learning by building. Improving one commit at a time.</b> 🚀
+  <strong>💻 Learning by building. Improving one commit at a time. 🚀</strong>
 </p>
