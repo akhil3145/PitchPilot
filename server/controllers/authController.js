@@ -162,3 +162,52 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
+// Resend OTP for an existing unverified account
+exports.resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const user = await User.findOne({
+      email: email.trim().toLowerCase()
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Account not found' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        message: 'Account already verified. Please log in.'
+      });
+    }
+
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    await user.save();
+
+    const message =
+      `Your OTP for verification is: ${otp}\n\n` +
+      'This OTP is valid for 10 minutes.';
+
+    await sendEmail({
+      email: user.email,
+      subject: 'Email Verification OTP - PitchPilot',
+      message
+    });
+
+    return res.status(200).json({
+      message: 'A new verification OTP has been sent to your email.'
+    });
+  } catch (error) {
+    console.error('Resend OTP error:', error.message);
+    return res.status(500).json({
+      message: 'Could not send verification email. Please try again.'
+    });
+  }
+};

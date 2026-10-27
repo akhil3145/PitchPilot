@@ -4,9 +4,7 @@
 
 <h1 align="center">🚀 PitchPilot</h1>
 
-<p align="center">
-  <strong>Your AI Copilot for Smarter Outreach</strong>
-</p>
+A full-stack AI-powered outreach application built with **React, Node.js, Express, MongoDB, and Groq AI**. This project is being customized and improved as a hands-on journey into full-stack development and AI integration. 🤖
 
 <p align="center">
   Generate personalized cold emails, LinkedIn DMs, and follow-ups with AI.
@@ -44,17 +42,17 @@ It helps users draft personalized messages for professional networking, job appl
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| ⚛️ React + Vite | Frontend and development server |
-| 🎨 Tailwind CSS | UI styling |
-| 🟢 Node.js + Express | Backend and REST API |
-| 🍃 MongoDB + Mongoose | Data storage |
-| 🧠 Groq API | AI-powered message generation |
-| 🔑 JWT + bcrypt | Authentication utilities |
-| 📧 Nodemailer | Email delivery and verification |
-| 🐳 Docker | Containerization |
-| 🌿 Git + GitHub | Version control |
+| Technology            | Purpose                         |
+| --------------------- | ------------------------------- |
+| ⚛️ React + Vite       | Frontend and development server |
+| 🎨 Tailwind CSS       | UI styling                      |
+| 🟢 Node.js + Express  | Backend and REST API            |
+| 🍃 MongoDB + Mongoose | Data storage                    |
+| 🧠 Groq API           | AI-powered message generation   |
+| 🔑 JWT + bcrypt       | Authentication utilities        |
+| 📧 Nodemailer         | Email delivery and verification |
+| 🐳 Docker             | Containerization                |
+| 🌿 Git + GitHub       | Version control                 |
 
 ## 🏗️ Project Structure
 
@@ -148,10 +146,10 @@ npm run dev
 
 The development servers are expected at:
 
-| Service | URL |
-|---|---|
+| Service     | URL                   |
+| ----------- | --------------------- |
 | 💻 Frontend | http://localhost:5173 |
-| ⚙️ Backend | http://localhost:5000 |
+| ⚙️ Backend  | http://localhost:5000 |
 
 The backend needs a working MongoDB connection. AI generation requires a valid Groq API key.
 

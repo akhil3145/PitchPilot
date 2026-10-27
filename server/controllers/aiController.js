@@ -1,3 +1,4 @@
+
 const axios = require('axios');
 const EmailHistory = require('../models/EmailHistory');
 
@@ -5,197 +6,165 @@ exports.generateEmail = async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    if (!prompt) {
-      return res.status(400).json({ message: 'Prompt is required' });
-    }
-
-    if (typeof prompt !== 'string') {
-      return res.status(400).json({ message: 'Prompt must be a string' });
-    }
-
-    if (prompt.trim().length === 0) {
-      return res.status(400).json({ message: 'Prompt cannot be empty' });
+    // Validate prompt
+    if (typeof prompt !== 'string' || !prompt.trim()) {
+      return res.status(400).json({
+        message: 'Please enter a prompt.'
+      });
     }
 
     if (prompt.length > 2000) {
-      return res.status(400).json({ message: 'Prompt cannot exceed 2000 characters' });
+      return res.status(400).json({
+        message: 'Prompt cannot exceed 2000 characters.'
+      });
     }
 
-    // Call Groq API (Free tier - No quota issues!)
+    // Validate Groq API key
     const groqApiKey = process.env.GROQ_API_KEY;
+
     if (!groqApiKey) {
-      return res.status(500).json({ message: 'AI service is not configured' });
+      return res.status(500).json({
+        message: 'AI service is not configured.'
+      });
     }
 
-    const systemPrompt = `You are an expert job outreach strategist.
+    const systemPrompt = `
+You are PitchPilot, an expert cold-email writing assistant.
 
-Your task is to generate a HIGH-CONVERTING cold email to a recruiter for a job opportunity.
+Generate personalized, professional outreach content based on the user's prompt.
+Do not invent specific facts, experience, achievements, or company information.
+Use placeholders when information is missing.
 
-IMPORTANT:
-- Even if the user gives only 2–4 words, assume realistic context.
-- Do NOT ask for clarification.
-- Make professional assumptions.
-- Avoid generic phrases.
-- Keep it concise and structured.
+Return all four fields:
+- subject: 6-9 words
+- emailBody: approximately 80-120 words
+- linkedInDM: 30-40 words
+- followUpEmail: 50-60 words
 
-====================================================
-OUTPUT FORMAT (STRICT)
-====================================================
+Use a professional, natural, confident tone.
+Avoid generic phrases and exaggerated claims.
+Return only the requested JSON object, with no Markdown or extra text.
+`;
 
-Return ONLY valid JSON:
-
-{
-  "subject": "",
-  "emailBody": "",
-  "linkedInDM": "",
-  "followUpEmail": ""
-}
-
-No markdown.
-No explanations.
-Only JSON.
-
-====================================================
-CONTEXT ASSUMPTIONS
-====================================================
-
-Assume:
-- Candidate has 2+ years experience
-- Strong in DSA and system design
-- Has worked on backend APIs or scalable systems
-- Has contributed to production-level features
-- Actively seeking Software Engineer roles
-
-If prompt is short like:
-"SDE role"
-"Backend engineer"
-"Startup job"
-"Product company"
-
-Create intelligent assumptions about:
-- Scaling challenges
-- Hiring urgency
-- Performance or system reliability issues
-- Team growth
-
-====================================================
-SUBJECT LINE RULES
-====================================================
-
-• 6–9 words
-• Must sound confident
-• No generic phrases like:
-  - "Quick question"
-  - "Looking for opportunity"
-  - "Job application"
-• Should highlight value or experience
-
-Example styles:
-"Backend engineer with 2+ yrs scaling APIs"
-"Engineer focused on scalable system design"
-"Software engineer improving system performance"
-
-====================================================
-EMAIL BODY STRUCTURE (STRICT)
-====================================================
-
-Keep 60–90 words.
-
-Line 1: Personalized observation about hiring  
-Line 2: Mention common hiring/scaling challenge  
-Line 3-4: Candidate's experience and strengths  
-Line 5: Specific impact or contribution  
-Line 6: Clear CTA  
-Line 7: Sign-off with name and title  
-
-Tone:
-• Confident
-• Professional
-• Not desperate
-• No emojis
-• No hype words
-
-====================================================
-LINKEDIN DM STRUCTURE
-====================================================
-
-30–50 words.
-Short, conversational.
-Observation + value + soft ask.
-
-====================================================
-FOLLOW-UP EMAIL STRUCTURE
-====================================================
-
-50–80 words.
-New angle.
-Emphasize long-term value.
-Professional urgency.
-Clear CTA.
-
-====================================================
-
-Return ONLY valid JSON.`;
-    
-    const fullPrompt = `${systemPrompt}\n\nUser REQUEST: "${prompt.trim()}"\n\nGenerate STRONG cold email even if prompt is short. Make smart assumptions. Return ONLY valid JSON:\n{"subject": "...", "emailBody": "...", "linkedInDM": "...", "followUpEmail": "..."}`;
+    // Generate email using Groq
     const aiResponse = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
       {
-        model: "llama-3.3-70b-versatile",
+        model: 'openai/gpt-oss-120b',
         messages: [
           {
-            role: "user",
-            content: fullPrompt
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: prompt.trim()
           }
         ],
-        temperature: 0.7,
-        max_tokens: 1024
+        temperature: 0.4,
+        max_completion_tokens: 4000,
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'pitchpilot_email',
+            strict: true,
+            schema: {
+              type: 'object',
+              properties: {
+                subject: { type: 'string' },
+                emailBody: { type: 'string' },
+                linkedInDM: { type: 'string' },
+                followUpEmail: { type: 'string' }
+              },
+              required: [
+                'subject',
+                'emailBody',
+                'linkedInDM',
+                'followUpEmail'
+              ],
+              additionalProperties: false
+            }
+          }
+        }
       },
       {
         headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
+          Authorization: `Bearer ${groqApiKey}`,
           'Content-Type': 'application/json'
         },
-        timeout: 30000
+        timeout: 60000
       }
     );
 
-    // Parse the Groq response
-    if (!aiResponse.data.choices || !aiResponse.data.choices[0] || !aiResponse.data.choices[0].message) {
-      throw new Error('Invalid response from Groq API');
-    }
+    const choice = aiResponse.data?.choices?.[0];
+    const generatedText = choice?.message?.content;
 
-    const generatedText = aiResponse.data.choices[0].message.content;
-    
-    // Extract JSON from the response
-    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-    let parsedResponse;
-    
-    try {
-      parsedResponse = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(generatedText);
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError, 'Generated text:', generatedText);
-      return res.status(500).json({ 
-        message: 'Failed to parse AI response', 
-        error: 'The AI generated invalid JSON. Please try again.' 
+    // Log diagnostic information without exposing credentials
+    console.log('Groq finish reason:', choice?.finish_reason);
+    console.log('Groq response received:', Boolean(choice));
+
+    if (choice?.finish_reason === 'length') {
+      return res.status(502).json({
+        message: 'The AI response was cut off. Please try again.'
       });
     }
 
+    if (
+      typeof generatedText !== 'string' ||
+      generatedText.trim().length === 0
+    ) {
+      console.error('Groq returned empty content:', {
+        finishReason: choice?.finish_reason
+      });
+
+      return res.status(502).json({
+        message: 'The AI returned an empty response. Please try again.'
+      });
+    }
+
+    // Parse the JSON response
+    let parsedResponse;
+
+    try {
+      parsedResponse = JSON.parse(generatedText);
+    } catch (parseError) {
+      console.error('Groq returned invalid JSON:', generatedText);
+
+      return res.status(502).json({
+        message: 'The AI returned an invalid response. Please try again.'
+      });
+    }
+
+    // Validate and normalize fields
     const emailData = {
-      subject: parsedResponse.subject || "New Opportunity",
-      emailBody: parsedResponse.emailBody || "",
-      linkedInDM: parsedResponse.linkedInDM || "",
-      followUpEmail: parsedResponse.followUpEmail || ""
+      subject: typeof parsedResponse.subject === 'string'
+        ? parsedResponse.subject.trim()
+        : '',
+      emailBody: typeof parsedResponse.emailBody === 'string'
+        ? parsedResponse.emailBody.trim()
+        : '',
+      linkedInDM: typeof parsedResponse.linkedInDM === 'string'
+        ? parsedResponse.linkedInDM.trim()
+        : '',
+      followUpEmail: typeof parsedResponse.followUpEmail === 'string'
+        ? parsedResponse.followUpEmail.trim()
+        : ''
     };
 
-    // Validate response data
     if (!emailData.subject || !emailData.emailBody) {
-      return res.status(500).json({ 
-        message: 'AI generated incomplete email data. Please try again.' 
+      return res.status(502).json({
+        message: 'The AI response is missing the email subject or body.'
       });
     }
 
-    // Save to history
+    // Ensure user is authenticated
+    if (!req.user?._id) {
+      return res.status(401).json({
+        message: 'Please log in again.'
+      });
+    }
+
+    // Save generated email to history
     const historyEntry = await EmailHistory.create({
       userId: req.user._id,
       prompt: prompt.trim(),
@@ -205,29 +174,70 @@ Return ONLY valid JSON.`;
       followUpEmail: emailData.followUpEmail
     });
 
-    res.status(200).json(historyEntry);
+    return res.status(200).json(historyEntry);
+
   } catch (error) {
-    console.error('AI Generation Error:', error.response?.data || error.message);
-    
-    if (error.response?.status === 429) {
-      return res.status(429).json({ 
-        message: 'Too many requests. Please wait a moment before trying again.',
-        error: 'Rate limit exceeded'
+    const status = error.response?.status;
+    const apiError = error.response?.data?.error;
+
+    console.error('AI Generation Error:', {
+      status,
+      code: apiError?.code,
+      message: apiError?.message || error.message,
+      failedGeneration: apiError?.failed_generation
+    });
+
+    if (status === 429) {
+      return res.status(429).json({
+        message: 'Groq rate limit reached. Please wait and try again.'
       });
     }
 
-    res.status(500).json({ 
-      message: 'Failed to generate email', 
-      error: error.response?.data?.error?.message || error.message 
+    if (status === 401) {
+      return res.status(502).json({
+        message: 'Groq rejected the API credentials. Check your server configuration.'
+      });
+    }
+
+    if (status === 400) {
+      return res.status(502).json({
+        message: 'Groq rejected the generation request. Check the model and response format.',
+        error: apiError?.message || 'Invalid request'
+      });
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      return res.status(504).json({
+        message: 'The AI request timed out. Please try again.'
+      });
+    }
+
+    return res.status(500).json({
+      message: 'Failed to generate email.',
+      error: apiError?.message || error.message
     });
   }
 };
 
 exports.getHistory = async (req, res) => {
   try {
-    const history = await EmailHistory.find({ userId: req.user._id }).sort({ createdAt: -1 });
-    res.status(200).json(history);
+    if (!req.user?._id) {
+      return res.status(401).json({
+        message: 'Please log in again.'
+      });
+    }
+
+    const history = await EmailHistory
+      .find({ userId: req.user._id })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(history);
+
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch history' });
+    console.error('History fetch error:', error.message);
+
+    return res.status(500).json({
+      message: 'Failed to fetch email history.'
+    });
   }
 };
